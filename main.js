@@ -15,6 +15,8 @@ var CTX = CANVAS.getContext('2d');
 var SCREEN_WIDTH = (CANVAS.width = 420);
 var SCREEN_HEIGHT = (CANVAS.height = 420);
 var PRESSED_KEYS = {};
+var score = 0;
+var invaderCount = 50;
 var KEYS = {
     W: 87,
     A: 65,
@@ -182,16 +184,24 @@ var gameLoop = function () {
     GAME.bullets
         .map(function (bullet) { return (bullet.update(), bullet); })
         .map(function (bullet, index) {
-        if (bullet.y < 0)
-            GAME.bullets.splice(index, 1);
-        GAME.invaders.map(function (invader, invaderIndex) {
-            if (bullet.intersects(invader)) {
+            if (bullet.y < 0)
                 GAME.bullets.splice(index, 1);
-                GAME.invaders.splice(invaderIndex, 1);
-            }
-        });
-        return bullet;
-    })
+            GAME.invaders.map(function (invader, invaderIndex) {
+                if (bullet.intersects(invader)) {
+                    GAME.bullets.splice(index, 1);
+                    GAME.invaders.splice(invaderIndex, 1);
+                    score += 100;
+                    invaderCount -= 1;
+                    document.getElementById("demo").innerHTML = score;
+
+                    if(invaderCount == 0){
+                        CTX.fillText("Game Over",10,50);
+                    }
+
+                }
+            });
+            return bullet;
+        })
         .map(Stage.render);
 };
 var setup = function () {
@@ -200,7 +210,6 @@ var setup = function () {
     player.x = SCREEN_WIDTH / 2 - player.width / 2;
     GAME.bullets = [];
     GAME.invaders = [];
-    var invaderCount = 50;
     var horizontalGap = 40;
     var verticalGap = 40;
     var startPosition = { x: -20, y: 50 };
@@ -219,7 +228,6 @@ var setup = function () {
     GAME.player = player;
     window.addEventListener('keyup', keyUpHandler, false);
     window.addEventListener('keydown', keyDownHandler, false);
-
 
 };
 // INIT
